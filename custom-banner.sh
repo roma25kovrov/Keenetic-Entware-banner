@@ -44,7 +44,7 @@ printf "   ${wht} %-10s ${ylw} %-30s ${wht} %-10s ${ylw}    %-30s ${clr}\n" \
     "Date:" "📆$(date)" \
     "Uptime:" "🕐 $(uptime -p)"
 printf "   ${wht} %-10s ${blu} %-30s ${wht} %-10s ${blu}  %-30s ${clr}\n" \
-    "Hostname:" "$(hostname)" \
+    "Router:" "$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}')" \
     "Accessed IP:" "$EXT_IP"
 printf "   ${wht} %-10s ${grn} %-30s ${wht}   %-10s ${grn}    %-30s ${clr}\n" \
     "OS:" "$(uname -s) 🐧" \
