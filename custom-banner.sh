@@ -36,7 +36,7 @@ else
 fi
 
 # Получение внешнего IP
-EXT_IP="$(wget -qO- https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
+EXT_IP="$(curl -s https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
 
 # Вывод информации
 printf "\n"
