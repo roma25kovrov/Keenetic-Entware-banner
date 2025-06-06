@@ -3,7 +3,12 @@
 # Install (wget)
 
 ```
-opkg update && opkg install coreutils-df procps-ng-free procps-ng-uptime && wget -O /opt/etc/custom-banner.sh https://raw.githubusercontent.com/OMchik33/Keenetic-Entware-banner/main/custom-banner.sh && chmod +x /opt/etc/custom-banner.sh && grep -qxF '/opt/etc/custom-banner.sh' ~/.profile || echo '/opt/etc/custom-banner.sh' >> ~/.profile
+opkg update && \
+opkg install coreutils-df procps-ng-free procps-ng-uptime && \
+wget -O /opt/etc/custom-banner.sh https://raw.githubusercontent.com/OMchik33/Keenetic-Entware-banner/main/custom-banner.sh && \
+chmod +x /opt/etc/custom-banner.sh && \
+grep -qxF '/opt/etc/custom-banner.sh' ~/.profile || echo '/opt/etc/custom-banner.sh' >> ~/.profile
+
 ```
 
 # Install (curl)
