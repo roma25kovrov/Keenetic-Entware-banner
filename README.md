@@ -9,4 +9,6 @@ opkg update && opkg install coreutils-df procps-ng-free procps-ng-uptime && wget
 
 * Materials from the article were used:
   
-```https://forum.keenetic.ru/topic/16444-bash-%D0%BD%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BA%D1%80%B0%D1%81%D0%BE%D0%BA/```
+```
+https://forum.keenetic.ru/topic/16444-bash-%D0%BD%D0%B5%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BA%D1%80%B0%D1%81%D0%BE%D0%BA/
+```
