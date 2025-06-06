@@ -55,7 +55,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Memory:" "$(free -h --mega | awk '/Mem/{print $2" (всего) / "$3" (использовано) / "$4" (свободно)"}')"
+    "Memory:" "$(free -h --mega | awk '/Mem/{print $2" (total) / "$3" (used) / "$4" (free)"}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Swap:" "$(free -h --mega | awk '/Swap/{print $2" (total) / "$3" (used) / "$4" (free)"}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
