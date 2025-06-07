@@ -5,7 +5,7 @@
 
 ```
 opkg update && \
-opkg install curl coreutils-df procps-ng-free procps-ng-uptime && \
+opkg install curl wget wget-ssl coreutils-df procps-ng-free procps-ng-uptime && \
 curl -fsSL -o /opt/etc/custom-banner.sh https://raw.githubusercontent.com/roma25kovrov/Keenetic-Entware-banner/refs/heads/main/custom-banner.sh && \
 chmod +x /opt/etc/custom-banner.sh && \
 grep -qxF '/opt/etc/custom-banner.sh' ~/.profile || echo '/opt/etc/custom-banner.sh' >> ~/.profile
