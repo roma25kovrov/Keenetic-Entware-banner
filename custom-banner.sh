@@ -41,7 +41,7 @@ EXT_IP="$(curl -s https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
 # Вывод информации
 printf "\n"
 printf "   ${wht} %-10s ${ylw} %-30s ${wht} %-10s ${ylw}    %-30s ${clr}\n" \
-    "Date:" "📆$(date)" \
+    "Date:" "📆 $(date)" \
     "Uptime:" "🕐 $(uptime -p)"
 printf "   ${wht} %-10s ${blu} %-30s ${wht} %-10s ${blu}  %-30s ${clr}\n" \
     "Router:" "$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}')" \
