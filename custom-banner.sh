@@ -47,6 +47,8 @@ opkg update > /dev/null 2>&1
 # Зависимости: coreutils-df procps-ng-free procps-ng-uptime
 
 # Определение температуры процессора
+### thermal
+#THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b4- | rev).$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b2-3 | rev)"
 THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | sed 's/\(.\)..$/.\1/')"
 
 if [ "$(echo $THERMAL | cut -b-2)" -ge "52" ]; then
@@ -83,7 +85,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht}   %-10s ${grn}    %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
-printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
+printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
     "CPU Temp:" "🌡 $(echo $THERMAL)℃"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
