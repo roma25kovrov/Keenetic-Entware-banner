@@ -98,7 +98,7 @@ printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
     "User:" "🤵 $(echo $USER)"
 printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
-    "SSH:" "$(netstat -tn 2>/dev/null | grep ':222 ' | grep ESTABLISHED | wc -l)"
+    "SSH:" "$(netstat -tn 2>/dev/null | grep ':444 ' | grep ESTABLISHED | wc -l)"
 
 # Версия Entware
 if [ -f "/opt/etc/entware_release" ]; then
