@@ -82,7 +82,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Coress:" "$(grep -c ^processor /proc/cpuinfo 2>/dev/null || echo '?')"
+    "Coress:" "$(grep -c ^processor /proc/cpuinfo 2>/dev/null || echo '?')" \
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "CPU Temp:" "🌡 $(echo $THERMAL)℃" \
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
