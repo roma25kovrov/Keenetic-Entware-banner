@@ -46,6 +46,17 @@ opkg update > /dev/null 2>&1
 
 # Зависимости: coreutils-df procps-ng-free procps-ng-uptime
 
+# Определение температуры процессора
+THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | sed 's/\(.\)..$/.\1/')"
+
+if [ "$(echo $THERMAL | cut -b-2)" -ge "52" ]; then
+  thermal="$red"
+elif [ "$(echo $THERMAL | cut -b-2)" -le "50" ]; then
+  thermal="$grn"
+else
+  thermal="$ylw"
+fi
+
 # Определение типа процессора
 _CPU_TYPE="$(cat /proc/cpuinfo | awk -F: '/(model|system)/{print $2}' | head -1 | sed 's, ,,')"
 
@@ -73,7 +84,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
 printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
-    "CPU Temp:" "$(($(cat /sys/class/thermal/thermal_zone0/temp)/1000))°C"
+    "CPU Temp:" "🌡 $(echo $THERMAL)℃"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
