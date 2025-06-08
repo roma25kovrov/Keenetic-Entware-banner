@@ -83,7 +83,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
 printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "CPU Temp:" "🌡 $(echo $THERMAL)℃"
+    "CPU Temp:" "🌡  $(echo $THERMAL)℃"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
