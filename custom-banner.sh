@@ -44,16 +44,7 @@ sh_prompt
 # Обновление opkg
 opkg update > /dev/null 2>&1
 
-# Получение Температуры процессора
-THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | sed 's/\(.\)..$/.\1/')"
-
-if [ "$(echo $THERMAL | cut -b-2)" -ge "52" ]; then
-  thermal="$red"
-elif [ "$(echo $THERMAL | cut -b-2)" -le "50" ]; then
-  thermal="$grn"
-else
-  thermal="$ylw"
-fi
+# Зависимости: coreutils-df procps-ng-free procps-ng-uptime
 
 # Определение типа процессора
 _CPU_TYPE="$(cat /proc/cpuinfo | awk -F: '/(model|system)/{print $2}' | head -1 | sed 's, ,,')"
@@ -70,8 +61,8 @@ EXT_IP="$(curl -s https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
 # Вывод информации
 printf "\n"
 printf "   ${wht} %-10s ${ylw} %-30s ${wht} %-10s ${ylw}    %-30s ${clr}\n" \
-    "Date:" "🗓️ $(date)" \
-    "Uptime:" "🕒 $(uptime -p)"
+    "Date:" "📆 $(date)" \
+    "Uptime:" "🕐 $(uptime -p)"
 printf "   ${wht} %-10s ${blu} %-30s ${wht} %-10s ${blu}  %-30s ${clr}\n" \
     "Router:" "$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}')" \
     "Accessed IP:" "$EXT_IP"
@@ -81,10 +72,8 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht}   %-10s ${grn}    %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Coress:" "$(grep -c ^processor /proc/cpuinfo 2>/dev/null || echo '?')"
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "CPU Temp:" "🌡 $(echo $THERMAL)℃"
+printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
+    "CPU Temp:" "$(($(cat /sys/class/thermal/thermal_zone0/temp)/1000))°C"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
