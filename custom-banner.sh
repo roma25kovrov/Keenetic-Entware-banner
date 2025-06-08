@@ -44,7 +44,6 @@ sh_prompt
 # Обновление opkg
 opkg update > /dev/null 2>&1
 
-# Зависимости: coreutils-df procps-ng-free procps-ng-uptime
 # Получение Температуры процессора
 THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | sed 's/\(.\)..$/.\1/')"
 
