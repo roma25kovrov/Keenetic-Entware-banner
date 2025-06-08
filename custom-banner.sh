@@ -71,8 +71,8 @@ EXT_IP="$(curl -s https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
 # Вывод информации
 printf "\n"
 printf "   ${wht} %-10s ${ylw} %-30s ${wht} %-10s ${ylw}    %-30s ${clr}\n" \
-    "Date:" "📆 $(date)" \
-    "Uptime:" "🕐 $(uptime -p)"
+    "Date:" "🗓️ $(date)" \
+    "Uptime:" "🕒 $(uptime -p)"
 printf "   ${wht} %-10s ${blu} %-30s ${wht} %-10s ${blu}  %-30s ${clr}\n" \
     "Router:" "$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}')" \
     "Accessed IP:" "$EXT_IP"
@@ -83,7 +83,7 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
 printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "CPU Temp:" "🌡  $(echo $THERMAL)℃"
+    "CPU Temp:" "🌡 $(echo $THERMAL)℃"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
