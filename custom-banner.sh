@@ -96,7 +96,9 @@ printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
     "LA:" "$(cat /proc/loadavg | awk '{print $1" (1m) / "$2" (5m) / "$3" (15m)"}')"
 printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
-    "User:" "🤵 $(echo $USER)" | echo "$(netstat -tn 2>/dev/null | grep ':222 ' | grep ESTABLISHED | wc -l)"
+    "User:" "🤵 $(echo $USER)"
+printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
+    "SSH:" "echo "$(netstat -tn 2>/dev/null | grep ':222 ' | grep ESTABLISHED | wc -l)"
 
 # Версия Entware
 if [ -f "/opt/etc/entware_release" ]; then
