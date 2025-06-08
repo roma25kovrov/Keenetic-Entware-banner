@@ -46,6 +46,7 @@ opkg update > /dev/null 2>&1
 
 # Зависимости: coreutils-df procps-ng-free procps-ng-uptime
 
+
 # Определение температуры процессора
 ### thermal
 #THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b4- | rev).$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b2-3 | rev)"
@@ -85,6 +86,8 @@ printf "   ${wht} %-10s ${grn} %-30s ${wht}   %-10s ${grn}    %-30s ${clr}\n" \
 printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
     "Kernel:" "$(uname -r)" \
     "Architecture:" "$(uname -m)"
+printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
+    "BusyBox:" "$(busybox 2>&1 | awk 'NR==1{print " ", $2}')"
 printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
     "CPU Temp:" "🌡 $(echo $THERMAL)℃"
 printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
