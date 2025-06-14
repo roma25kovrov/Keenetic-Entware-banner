@@ -40,7 +40,7 @@ get_cpu_temp() {
 
 print_system_info() {
     # Получаем все данные
-	local busybox=$(busybox 2>&1 | awk 'NR==1{print " ", $2}')
+    local busybox=$(busybox 2>&1 | awk 'NR==1{print " ", $2}')
     local current_date=$(date +'%Y-%m-%d %H:%M:%S')
     local uptime=$(uptime -p 2>/dev/null | sed 's/^up //' || echo 'N/A')
     local router_model=$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}' || echo 'Unknown')
