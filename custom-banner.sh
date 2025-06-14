@@ -2,28 +2,20 @@
 
 . /opt/etc/profile
 
-# PROMPT
-# colors
+# Цветовые коды
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+PURPLE='\e[35m'
+CYAN='\e[36m'
+WHITE='\e[37m'
+NC='\e[0m' # No Color
 
-blk="\033[1;30m"   # Black
-red="\033[1;31m"   # Red
-grn="\033[1;32m"   # Green
-ylw="\033[1;33m"   # Yellow
-blu="\033[1;34m"   # Blue
-pur="\033[1;35m"   # Purple
-cyn="\033[1;36m"   # Cyan
-wht="\033[1;37m"   # White
-clr="\033[0m"      # Reset
-
-print_menu() {
-  # Очистка экрана
-  printf "\033c"
-  
-  # Установка цвета текста (если переменная CYAN определена)
-  printf "${blu}"
-
-  # Вывод текста в многострочном формате
-  cat << 'EOF'
+print_banner() {
+    printf "\e[1;1H\e[2J" # Очистка экрана
+    printf "${RED}"
+    cat << 'EOF'
                         _______   _________       _____    ____  ______
                        / ____/ | / /_  __/ |     / /   |  / __ \/ ____/
                       / __/ /  |/ / / /  | | /| / / /| | / /_/ / __/
@@ -32,92 +24,69 @@ print_menu() {
 EOF
 }
 
-# Вызов функции для отображения меню
-print_menu
-
-# Set the prompt.
-sh_prompt() {
-    PS1=${cyn}' \w '${grn}' \$ '${clr}
+get_cpu_temp() {
+    local temp_file="/sys/class/thermal/thermal_zone0/temp"
+    [ ! -f "$temp_file" ] && printf "${YELLOW}N/A${NC}" && return
+    
+    local temp=$(cat "$temp_file")
+    local temp_c=$(echo "scale=1; $temp/1000" | bc)
+    
+    if [ $(echo "$temp_c >= 52" | bc) -eq 1 ]; then
+        printf "${RED}%.1f°C${NC}" "$temp_c"
+    elif [ $(echo "$temp_c <= 50" | bc) -eq 1 ]; then
+        printf "${GREEN}%.1f°C${NC}" "$temp_c"
+    else
+        printf "${YELLOW}%.1f°C${NC}" "$temp_c"
+    fi
 }
-sh_prompt
 
-# Обновление opkg
-opkg update > /dev/null 2>&1
+print_system_info() {
+    # Получаем все данные
+	local busybox=$(busybox 2>&1 | awk 'NR==1{print " ", $2}')
+    local current_date=$(date +'%Y-%m-%d %H:%M:%S')
+    local uptime=$(uptime -p 2>/dev/null | sed 's/^up //' || echo 'N/A')
+    local router_model=$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}' || echo 'Unknown')
+    local ext_ip=$(curl -s --connect-timeout 3 https://ipinfo.io/ip || echo 'N/A')
+    local cpu_type=$(cat /proc/cpuinfo 2>/dev/null | awk -F: '/model name|system type/{print $2}' | head -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [ -z "$cpu_type" ] && cpu_type="Unknown"
+    local cpu_temp=$(get_cpu_temp)
+    local cores=$(nproc 2>/dev/null || grep -c ^processor /proc/cpuinfo 2>/dev/null || echo "?")
+    local architecture=$(uname -m)
+    local kernel=$(uname -r)
+    local os=$(uname -s)
+    local processes=$(ps | wc -l)
+    local disk_info=$(df -h /opt 2>/dev/null | awk 'NR==2{print $3"/"$2" used ("$5")"}')
+    local mem_info=$(free -h 2>/dev/null | awk '/Mem/{print $3"/"$2" used"}')
+    local swap_info=$(free -h 2>/dev/null | awk '/Swap/{print $3"/"$2" used"}')
+    local load_avg=$(awk '{print $1", "$2", "$3}' /proc/loadavg 2>/dev/null)
+    local packages=$(opkg list-installed 2>/dev/null | wc -l)
+    local upgrades=$(opkg list-upgradable 2>/dev/null | wc -l)
+    local ssh_sessions=$(netstat -tn 2>/dev/null | grep -c ':222.*ESTABLISHED')
 
-# Зависимости: coreutils-df procps-ng-free procps-ng-uptime
+    # Вывод информации с идеальным выравниванием
+    printf "\n"
+	printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "BusyBox:" "$busybox"
+    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Date:" "📆 $current_date"
+    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Uptime:" "🕐 $uptime"
+    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Router:" "$router_model"
+    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "External IP:" "$ext_ip"
+    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "OS:" "$os 🐧"
+    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "CPU:" "$cpu_type"
+    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "Kernel:" "$kernel"
+    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "Architecture:" "$architecture"
+    printf "   ${WHITE}%-15s🌡 %-35s${NC}\n" "CPU Temp:" "$cpu_temp"
+    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Cores:" "$cores"
+    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Processes:" "$processes"
+    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Disk Usage:" "💾 $disk_info"
+    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Memory:" "🧠 $mem_info"
+    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Swap:" "🔀 $swap_info"
+    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Load Avg:" "📈 $load_avg"
+    printf "   ${WHITE}%-15s${CYAN}%-35s${NC}\n" "Packages:" "📦 $packages"
+    printf "   ${WHITE}%-15s${CYAN}%-35s${NC}\n" "Upgrades:" "🔄 $upgrades"
+    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "SSH Sessions:" "🔌 $ssh_sessions"
+    printf "\n${NC}"
+}
 
-
-# Определение температуры процессора
-### thermal
-#THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b4- | rev).$(cat /sys/class/thermal/thermal_zone0/temp | rev | cut -b2-3 | rev)"
-THERMAL="$(cat /sys/class/thermal/thermal_zone0/temp | sed 's/\(.\)..$/.\1/')"
-
-if [ "$(echo $THERMAL | cut -b-2)" -ge "52" ]; then
-  thermal="$red"
-elif [ "$(echo $THERMAL | cut -b-2)" -le "50" ]; then
-  thermal="$grn"
-else
-  thermal="$ylw"
-fi
-
-# Определение типа процессора
-_CPU_TYPE="$(cat /proc/cpuinfo | awk -F: '/(model|system)/{print $2}' | head -1 | sed 's, ,,')"
-
-if [ "$(uname -m)" = "aarch64" ]; then
-    CPU_TYPE="$_CPU_TYPE"
-else
-    CPU_TYPE="$_CPU_TYPE$(cat /proc/cpuinfo | awk -F: '/cpu model/{print $2}' | head -1)"
-fi
-
-# Получение внешнего IP
-EXT_IP="$(curl -s https://ipinfo.io/ip 2>/dev/null || echo 'N/A')"
-
-# Вывод информации
-printf "\n"
-printf "   ${wht} %-10s ${ylw} %-30s ${wht} %-10s ${ylw}    %-30s ${clr}\n" \
-    "Date:" "📆 $(date)" \
-    "Uptime:" "🕐 $(uptime -p)"
-printf "   ${wht} %-10s ${blu} %-30s ${wht} %-10s ${blu}  %-30s ${clr}\n" \
-    "Router:" "$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}')" \
-    "Accessed IP:" "$EXT_IP"
-printf "   ${wht} %-10s ${grn} %-30s ${wht}   %-10s ${grn}    %-30s ${clr}\n" \
-    "OS:" "$(uname -s) 🐧" \
-    "CPU:" "$CPU_TYPE"
-printf "   ${wht} %-10s ${grn} %-30s ${wht} %-10s ${grn} %-30s ${clr}\n" \
-    "Kernel:" "$(uname -r)" \
-    "Architecture:" "$(uname -m)"
-printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "BusyBox:" "$(busybox 2>&1 | awk 'NR==1{print " ", $2}')"
-printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "CPU Temp:" "🌡 $(echo $THERMAL)℃"
-printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "Cores:" "$(grep -c ^processor /proc/cpuinfo 2>/dev/null || echo '?')"
-printf "   ${wht} %-10s ${thermal} %-30s ${ctl}\n" \
-    "Processes:" "$(ps | wc -l)"    
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Disk:" "$(df -h | grep '/opt' | awk '{print $2" (size) / "$3" (used) / "$4" (free) / "$5" (used %) : 💾 "$6}')"
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Memory:" "$(free -h --mega | awk '/Mem/{print $2" (total) / "$3" (used) / "$4" (free)"}')"
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "Swap:" "$(free -h --mega | awk '/Swap/{print $2" (total) / "$3" (used) / "$4" (free)"}')"
-printf "   ${wht} %-10s ${pur} %-30s ${clr}\n" \
-    "LA:" "$(cat /proc/loadavg | awk '{print $1" (1m) / "$2" (5m) / "$3" (15m)"}')"
-printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
-    "User:" "🤵 $(echo $USER)"
-printf "   ${wht} %-10s ${red} %-30s ${wht}\n" \
-    "SSH:" "$(netstat -tn 2>/dev/null | grep ':222 ' | grep ESTABLISHED | wc -l)"
-
-# Версия Entware
-if [ -f "/opt/etc/entware_release" ]; then
-    printf "   ${wht} %-10s ${grn} %-30s ${clr}\n" \
-        "Dist:" "$(awk -F= '/^PRETTY_NAME/ {gsub(/"/, "", $2); print $2}' /opt/etc/entware_release)"
-else
-    printf "   ${wht} %-10s ${grn} %-30s ${clr}\n" \
-        "Dist:" "Entware"
-fi
-
-# Установленные и доступные обновления
-printf "   ${wht} %-10s ${cyn} %-30s ${wht}     %-10s ${cyn} %-30s ${clr}\n" \
-    "Installed:" "📦📦 $(opkg list-installed | wc -l)" \
-    "Upgrade:" "📦 $(opkg list-upgradable | wc -l)"
-printf "\n"
+# Главный запуск
+print_banner
+print_system_info
