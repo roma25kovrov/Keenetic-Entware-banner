@@ -63,7 +63,7 @@ print_system_info() {
 
     # Вывод информации с идеальным выравниванием
     printf "\n"
-	printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "BusyBox:" "$busybox"
+    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "BusyBox:" "$busybox"
     printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Date:" "📆 $current_date"
     printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Uptime:" "🕐 $uptime"
     printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Router:" "$router_model"
