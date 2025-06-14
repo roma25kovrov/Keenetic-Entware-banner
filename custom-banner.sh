@@ -31,12 +31,10 @@ get_cpu_temp() {
     local temp=$(cat "$temp_file")
     local temp_c=$(echo "scale=1; $temp/1000" | bc)
     
-    if [ $(echo "$temp_c >= 52" | bc) -eq 1 ]; then
-        printf "${RED}%.1f°C${NC}" "$temp_c"
-    elif [ $(echo "$temp_c <= 50" | bc) -eq 1 ]; then
-        printf "${GREEN}%.1f°C${NC}" "$temp_c"
+    if [ $(echo "$temp_c >= 65" | bc) -eq 1 ]; then
+       printf "${RED}%.1f°C${NC}" "$temp_c"
     else
-        printf "${YELLOW}%.1f°C${NC}" "$temp_c"
+       printf "${GREEN}%.1f°C${NC}" "$temp_c"
     fi
 }
 
