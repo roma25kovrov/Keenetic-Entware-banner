@@ -11,7 +11,13 @@ chmod +x /opt/etc/custom-banner.sh && \
 grep -qxF '/opt/etc/custom-banner.sh' ~/.profile || echo '/opt/etc/custom-banner.sh' >> ~/.profile
 
 ```
+# Unistall
 
+```
+rm -f /opt/etc/custom-banner.sh
+sed -i '\/opt\/etc\/custom-banner\.sh/d' ~/.profile
+
+```
 ---
 
 * Materials from the article were used:
