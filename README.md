@@ -1,4 +1,4 @@
-![banner-preview](https://github.com/user-attachments/assets/f90660f9-75da-428e-9f20-cc402bf5fe98)
+![banner-preview](https://drm-play.kovrov.crazedns.ru:8443/Entware.jpg)
 
 
 # Install
