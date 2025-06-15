@@ -3,24 +3,24 @@
 . /opt/etc/profile
 
 # Цветовые коды
-RED='\e[31m'
-GREEN='\e[32m'
-YELLOW='\e[33m'
-BLUE='\e[34m'
-PURPLE='\e[35m'
-CYAN='\e[36m'
-WHITE='\e[37m'
+RED='\e[3;31m'
+GREEN='\e[3;32m'
+YELLOW='\e[3;33m'
+BLUE='\e[3;34m'
+PURPLE='\e[3;35m'
+CYAN='\e[3;36m'
+WHITE='\e[3;37m'
 NC='\e[0m' # No Color
 
 print_banner() {
-    printf "\e[1;1H\e[2J" # Очистка экрана
+    printf "\e[1;1H\e[2J"
     printf "${RED}"
     cat << 'EOF'
-                        _______   _________       _____    ____  ______
-                       / ____/ | / /_  __/ |     / /   |  / __ \/ ____/
-                      / __/ /  |/ / / /  | | /| / / /| | / /_/ / __/
-                     / /___/ /|  / / /   | |/ |/ / ___ |/ _, _/ /___
-                    /_____/_/ |_/ /_/    |__/|__/_/  |_/_/ |_/_____/
+                                    _______   _________       _____    ____  ______
+                                   / ____/ | / /_  __/ |     / /   |  / __ \/ ____/
+                                  / __/ /  |/ / / /  | | /| / / /| | / /_/ / __/
+                                 / /___/ /|  / / /   | |/ |/ / ___ |/ _, _/ /___
+                                /_____/_/ |_/ /_/    |__/|__/_/  |_/_/ |_/_____/
 EOF
 }
 
@@ -32,15 +32,16 @@ get_cpu_temp() {
     local temp_c=$(echo "scale=1; $temp/1000" | bc)
     
     if [ $(echo "$temp_c >= 65" | bc) -eq 1 ]; then
-       printf "${RED}%.1f°C${NC}" "$temp_c"
+        printf "${RED}%.1f°C${NC}" "$temp_c"
+    elif [ $(echo "$temp_c <= 65" | bc) -eq 1 ]; then
+        printf "${GREEN}%.1f°C${NC}" "$temp_c"
     else
-       printf "${GREEN}%.1f°C${NC}" "$temp_c"
+        printf "${YELLOW}%.1f°C${NC}" "$temp_c"
     fi
 }
 
 print_system_info() {
     # Получаем все данные
-    local busybox=$(busybox 2>&1 | awk 'NR==1{print " ", $2}')
     local current_date=$(date +'%Y-%m-%d %H:%M:%S')
     local uptime=$(uptime -p 2>/dev/null | sed 's/^up //' || echo 'N/A')
     local router_model=$(ndmc -c "show version" 2>/dev/null | awk -F": " '/model/ {print $2}' || echo 'Unknown')
@@ -53,35 +54,52 @@ print_system_info() {
     local kernel=$(uname -r)
     local os=$(uname -s)
     local processes=$(ps | wc -l)
-    local disk_info=$(df -h /opt 2>/dev/null | awk 'NR==2{print $3"/"$2" used ("$5")"}')
-    local mem_info=$(free -h 2>/dev/null | awk '/Mem/{print $3"/"$2" used"}')
-    local swap_info=$(free -h 2>/dev/null | awk '/Swap/{print $3"/"$2" used"}')
+    local disk_info=$(df -h /opt 2>/dev/null | awk 'NR==2{print $3"/"$2" ("$5")"}')
+    local mem_info=$(free -h 2>/dev/null | awk '/Mem/{print $3"/"$2}')
+    local swap_info=$(free -h 2>/dev/null | awk '/Swap/{print $3"/"$2}')
     local load_avg=$(awk '{print $1", "$2", "$3}' /proc/loadavg 2>/dev/null)
     local packages=$(opkg list-installed 2>/dev/null | wc -l)
     local upgrades=$(opkg list-upgradable 2>/dev/null | wc -l)
-    local ssh_sessions=$(netstat -tn 2>/dev/null | grep -c ':222.*ESTABLISHED')
+    local ssh_sessions=$(netstat -tn 2>/dev/null | grep -c ':22.*ESTABLISHED')
 
-    # Вывод информации с идеальным выравниванием
+    # Вывод в две колонки
     printf "\n"
-    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "BusyBox:" "$busybox"
-    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Date:" "📆 $current_date"
-    printf "   ${WHITE}%-15s${YELLOW}%-35s${NC}\n" "Uptime:" "🕐 $uptime"
-    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Router:" "$router_model"
-    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "External IP:" "$ext_ip"
-    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "OS:" "$os 🐧"
-    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "CPU:" "$cpu_type"
-    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "Kernel:" "$kernel"
-    printf "   ${WHITE}%-15s${GREEN}%-35s${NC}\n" "Architecture:" "$architecture"
-    printf "   ${WHITE}%-15s🌡 %-35s${NC}\n" "CPU Temp:" "$cpu_temp"
-    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Cores:" "$cores"
-    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "Processes:" "$processes"
-    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Disk Usage:" "💾 $disk_info"
-    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Memory:" "🧠 $mem_info"
-    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Swap:" "🔀 $swap_info"
-    printf "   ${WHITE}%-15s${PURPLE}%-35s${NC}\n" "Load Avg:" "📈 $load_avg"
-    printf "   ${WHITE}%-15s${CYAN}%-35s${NC}\n" "Packages:" "📦 $packages"
-    printf "   ${WHITE}%-15s${CYAN}%-35s${NC}\n" "Upgrades:" "🔄 $upgrades"
-    printf "   ${WHITE}%-15s${RED}%-35s${NC}\n" "SSH Sessions:" "🔌 $ssh_sessions"
+    printf "   ${WHITE}%-15s${YELLOW}%-25s${NC}   				${WHITE}%-15s${YELLOW}%-25s${NC}\n" \
+        "Date:" "📆 $current_date" \
+        "Uptime:" "🕐 $uptime"
+    
+    printf "   ${WHITE}%-15s${RED}%-25s${NC} 				${WHITE}%-15s${RED}%-25s${NC}\n" \
+        "Router:" "$router_model" \
+        "External IP:" "$ext_ip"
+    
+    printf "   ${WHITE}%-15s${GREEN}%-25s${NC}   				${WHITE}%-15s${GREEN}%-25s${NC}\n" \
+        "OS:" "$os 🐧" \
+        "CPU:" "$cpu_type"
+    
+    printf "   ${WHITE}%-15s${GREEN}%-25s${NC} 				${WHITE}%-15s${GREEN}%-25s${NC}\n" \
+        "Kernel:" "$kernel" \
+        "Architecture:" "$architecture"
+    
+    printf "   ${WHITE}%-15s%-25s${NC}   	            				${WHITE}%-15s${GREEN}%-25s${NC}\n" \
+        "CPU Temp:" "🌡 $cpu_temp" \
+        "Cores:" "$cores"
+    
+    printf "   ${WHITE}%-15s${GREEN}%-25s${NC} 				${WHITE}%-15s${PURPLE}%-25s${NC}\n" \
+        "Processes:" "$processes" \
+        "Disk:" "💾 $disk_info"
+    
+    printf "   ${WHITE}%-15s${PURPLE}%-25s${NC}   				${WHITE}%-15s${PURPLE}%-25s${NC}\n" \
+        "Memory:" "🧠 $mem_info" \
+        "Swap:" "🔀 $swap_info"
+    
+    printf "   ${WHITE}%-15s${PURPLE}%-25s${NC}   				${WHITE}%-15s${CYAN}%-25s${NC}\n" \
+        "Load Avg:" "📈 $load_avg" \
+        "Packages:" "📦 $packages"
+    
+    printf "   ${WHITE}%-15s${RED}%-25s${NC}   				${WHITE}%-15s${CYAN}%-25s${NC}\n" \
+		"SSH Sessions:" "🔌 $ssh_sessions" \
+		"Upgrades:" "🔄 $upgrades"
+    
     printf "\n${NC}"
 }
 
