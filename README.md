@@ -1,4 +1,4 @@
-![banner-preview](https://drm-play.kovrov.crazedns.ru:8443/Entware.jpg)
+![banner-preview](https://drm-play.kovrov.crazedns.ru:8443/Entware.Jpg)
 
 
 # Install
